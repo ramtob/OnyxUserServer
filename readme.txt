@@ -1,1 +1,1 @@
-A dummy project to practice NSIS installer
+A dummy application to practice NSIS installer coding
