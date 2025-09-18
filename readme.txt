@@ -1,0 +1,1 @@
+A dummy project to practice NSIS installer
