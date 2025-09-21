@@ -42,6 +42,7 @@ Section "Install"
   FileClose $0
 
   ; Shortcuts (MultiUser sets the right context automatically)
+  DetailPrint "SMPROGRAMS = $SMPROGRAMS"
   CreateDirectory "$SMPROGRAMS\Onyx"
   CreateShortCut "$SMPROGRAMS\Onyx\User Server.lnk" "$INSTDIR\readme.txt"
   CreateShortCut "$SMPROGRAMS\Onyx\User Server Config.lnk" "$INSTDIR\UserServerConfig"
@@ -63,6 +64,7 @@ SectionEnd
 ; Uninstall
 ; -----------------------------------------
 Section "Uninstall"
+  DetailPrint "SMPROGRAMS = $SMPROGRAMS"
   Delete "$SMPROGRAMS\Onyx\User Server.lnk"
   Delete "$SMPROGRAMS\Onyx\User Server Config.lnk"
   RMDir  "$SMPROGRAMS\Onyx"
