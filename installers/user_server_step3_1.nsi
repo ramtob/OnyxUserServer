@@ -6,6 +6,7 @@
 !define MULTIUSER_INSTALLMODE_COMMANDLINE       ; (optional) /AllUsers or /CurrentUser for silent mode
 !define MULTIUSER_USE_PROGRAMFILES64            ; for all-users default to Program Files (64-bit)
 !include "MultiUser.nsh"
+!define MUI_PAGE_CUSTOMFUNCTION_PRE DirPage_Pre
 
 Name "Onyx User Server"
 OutFile "UserServer-Setup-step3_1.exe"
@@ -24,10 +25,30 @@ OutFile "UserServer-Setup-step3_1.exe"
 ; --- required init hooks for MultiUser ---
 Function .onInit
   !insertmacro MULTIUSER_INIT
+  SetRegView 64
 FunctionEnd
 
 Function un.onInit
   !insertmacro MULTIUSER_UNINIT
+  SetRegView 64
+  ; Default to CurrentUser if missing
+  StrCpy $0 "CurrentUser"
+  ReadRegStr $0 SHCTX "Software\Onyx\User Server" "InstallMode"
+
+  StrCmp $0 "AllUsers" 0 +2
+    SetShellVarContext all
+    Goto +2
+  SetShellVarContext current
+FunctionEnd
+
+Function DirPage_Pre
+  ; Set a default path based on chosen mode
+  ; $MultiUser.InstallMode is set by MultiUser.nsh to "AllUsers" or "CurrentUser"
+  StrCmp $MultiUser.InstallMode "AllUsers" 0 +3
+    StrCpy $INSTDIR "$PROGRAMFILES64\Onyx\User Server"
+    Return
+  ; Current user
+  StrCpy $INSTDIR "$LOCALAPPDATA\Onyx\User Server"
 FunctionEnd
 
 ; -----------------------------------------
@@ -49,6 +70,9 @@ Section "Install"
 
   ; Registry: use SHCTX so it goes to HKLM (all-users) or HKCU (just-me)
   WriteRegStr SHCTX "Software\Onyx\User Server" "InstallDir" "$INSTDIR"
+  ; Save the mode for the uninstaller: "AllUsers" or "CurrentUser"
+  WriteRegStr SHCTX "Software\Onyx\User Server" "InstallMode" "$MultiUser.InstallMode"
+
 
   WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "DisplayName"     "Onyx User Server"
   WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "Publisher"        "Onyx"
