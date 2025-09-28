@@ -1,2 +1,5 @@
+# Ignore all executable files
+*.exe
+
+# Ignore specific installer executables (redundant with *.exe but kept for clarity)
 installers/*.exe
-installers/UserServer-Setup-step3_1.exe
