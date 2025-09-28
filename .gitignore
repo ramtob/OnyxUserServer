@@ -1,5 +1,5 @@
 # Ignore all executable files
-*.exe
+# *.exe
 
 # Ignore specific installer executables (redundant with *.exe but kept for clarity)
 installers/*.exe
