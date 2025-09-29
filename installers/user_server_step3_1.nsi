@@ -33,6 +33,7 @@ InstallDir $INSTDIR
 Function .onInit
   !insertmacro MULTIUSER_INIT
   SetRegView 64
+  ; MessageBox MB_OK "EXEDIR = $EXEDIR"
 FunctionEnd
 
 Function un.onInit
@@ -82,7 +83,7 @@ Function un.onInit
     FileClose $9
     
     ; Optional: Show debug info immediately (comment out for production)
-    MessageBox MB_OK "Uninstall Debug:$\nMode: $0$\nSMPROGRAMS: $SMPROGRAMS$\n$\nCheck $TEMP\uninstall_debug.txt for details"
+    ; MessageBox MB_OK "Uninstall Debug:$\nMode: $0$\nSMPROGRAMS: $SMPROGRAMS$\n$\nCheck $TEMP\uninstall_debug.txt for details"
 FunctionEnd
 
 Var DirSuffix
