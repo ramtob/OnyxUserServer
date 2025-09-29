@@ -43,16 +43,46 @@ Function un.onInit
   StrCpy $0 "CurrentUser"
 
   ; $EXEDIR is the folder containing Uninstall.exe (i.e., $INSTDIR)
-  FileOpen $1 "$EXEDIR\install_mode.txt" r
-  IfErrors +3
+  FileOpen $1 "$INSTDIR\install_mode.txt" r
+  IfErrors mode_file_error
     FileRead $1 $0
     FileClose $1
-
-  ; Normalize and set context
-  StrCmp $0 "AllUsers" 0 +2
+    Goto set_context
+    
+  mode_file_error:
+    ; If file doesn't exist, default to CurrentUser as safest option
+    ; (We can't reliably detect AllUsers vs CurrentUser from path alone)
+    StrCpy $0 "CurrentUser"
+    ; Log to file since DetailPrint won't show in un.onInit
+    FileOpen $9 "$TEMP\uninstall_debug.txt" w
+    FileWrite $9 "Warning: install_mode.txt not found, defaulting to CurrentUser mode$\r$\n"
+    FileClose $9
+  
+  set_context:
+  ; Log the detected mode to file for debugging
+  FileOpen $9 "$TEMP\uninstall_debug.txt" a
+  FileWrite $9 "Detected install mode: '$0'$\r$\n"
+  
+  ; Set shell context based on install mode
+  StrCmp $0 "AllUsers" set_allusers set_currentuser
+  
+  set_allusers:
     SetShellVarContext all
-    Goto +2
-  SetShellVarContext current
+    FileWrite $9 "Set shell context to: all$\r$\n"
+    FileWrite $9 "SMPROGRAMS will be: $SMPROGRAMS$\r$\n"
+    Goto context_done
+    
+  set_currentuser:
+    SetShellVarContext current  
+    FileWrite $9 "Set shell context to: current$\r$\n"
+    FileWrite $9 "SMPROGRAMS will be: $SMPROGRAMS$\r$\n"
+    
+  context_done:
+    FileWrite $9 "un.onInit completed$\r$\n$\r$\n"
+    FileClose $9
+    
+    ; Optional: Show debug info immediately (comment out for production)
+    MessageBox MB_OK "Uninstall Debug:$\nMode: $0$\nSMPROGRAMS: $SMPROGRAMS$\n$\nCheck $TEMP\uninstall_debug.txt for details"
 FunctionEnd
 
 Var DirSuffix
@@ -140,24 +170,27 @@ SectionEnd
 ; Uninstall
 ; -----------------------------------------
 Section "Uninstall"
+  DetailPrint "=== Uninstall Section Started ==="
   DetailPrint "SMPROGRAMS = $SMPROGRAMS"
+  DetailPrint "INSTDIR = $INSTDIR"
+  
+  ; Remove Start Menu shortcuts
+  DetailPrint "Removing shortcuts from: $SMPROGRAMS\Onyx"
   Delete "$SMPROGRAMS\Onyx\User Server.lnk"
   Delete "$SMPROGRAMS\Onyx\User Server Config.lnk"
   RMDir  "$SMPROGRAMS\Onyx"
 
+  ; Remove installed files
+  DetailPrint "Removing files from: $INSTDIR"
   Delete "$INSTDIR\readme.txt"
-  Delete "$INSTDIR\Uninstall.exe"
   Delete "$INSTDIR\install_mode.txt"
+  Delete "$INSTDIR\Uninstall.exe"
   RMDir  "$INSTDIR"
 
-  ; Remove registry (HKLM or HKCU automatically based on how it was installed)
+  ; Remove registry keys using SHCTX (automatically uses correct hive)
+  DetailPrint "Removing registry keys with SHCTX"
   DeleteRegKey SHCTX "Software\Onyx\User Server"
   DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server"
-  ; Remove uninstall keys in both scopes (in case context was changed manually)
-  ; DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server"
-  ; DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server"
-  ; Remove app keys in both scopes
-  ; DeleteRegKey HKCU "Software\Onyx\User Server"
-  ; DeleteRegKey HKLM "Software\Onyx\User Server"
-
+  
+  DetailPrint "=== Uninstall Section Completed ==="
 SectionEnd
