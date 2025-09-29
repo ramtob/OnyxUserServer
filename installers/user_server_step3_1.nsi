@@ -82,8 +82,9 @@ Function un.onInit
     FileWrite $9 "un.onInit completed$\r$\n$\r$\n"
     FileClose $9
     
-    ; Optional: Show debug info immediately (comment out for production)
-    ; MessageBox MB_OK "Uninstall Debug:$\nMode: $0$\nSMPROGRAMS: $SMPROGRAMS$\n$\nCheck $TEMP\uninstall_debug.txt for details"
+  ; Optional: Show debug info immediately (comment out for production)
+  ; MessageBox MB_OK "Uninstall Debug:$\nMode: $0$\nSMPROGRAMS: $SMPROGRAMS$\n$\nCheck $TEMP\uninstall_debug.txt for details"
+  ; MessageBox MB_OK "EXEDIR = $EXEDIR"
 FunctionEnd
 
 Var DirSuffix
