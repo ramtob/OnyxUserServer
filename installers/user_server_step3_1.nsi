@@ -114,6 +114,20 @@ Function DirPage_Leave
   FileClose $9
 FunctionEnd
 
+!macro CreateShortcuts
+  DetailPrint "Creating shortcuts under $SMPROGRAMS\Onyx"
+  CreateDirectory "$SMPROGRAMS\Onyx"
+  CreateShortCut "$SMPROGRAMS\Onyx\User Server.lnk" "$INSTDIR\UserServer.txt"
+  CreateShortCut "$SMPROGRAMS\Onyx\User Server Config.lnk" "$INSTDIR\UserServerConfig.txt"  ; or a config editor EXE if/when you have it
+!macroend
+
+!macro RemoveShortcuts
+  DetailPrint "Removing shortcuts under $SMPROGRAMS\Onyx"
+  Delete "$SMPROGRAMS\Onyx\User Server.lnk"
+  Delete "$SMPROGRAMS\Onyx\User Server Config.lnk"
+  RMDir  "$SMPROGRAMS\Onyx"
+!macroend
+
 ; -----------------------------------------
 ; Install Section
 ; -----------------------------------------
@@ -136,10 +150,15 @@ Section "Install"
   ; Debug output (will show during install files page)
   DetailPrint "Install section started - INSTDIR = $INSTDIR"
 
-  ; demo payload
-  FileOpen $0 "$INSTDIR\readme.txt" w
-  FileWrite $0 "Onyx User Server installed here."
-  FileClose $0
+  ; --- 4.1 Copy app payload ---
+  SetOverwrite ifnewer                 ; safer for updates
+  ; Adjust path if your script isn’t next to project_root.
+  ; From your earlier layout, we’re in C:\Projects\OnyxUserServer\installers
+  ; so "..\dist\*" reaches the build folder:
+  File /r "..\dist\*.*"  ; demo payload
+  ; FileOpen $0 "$INSTDIR\readme.txt" w
+  ; FileWrite $0 "Onyx User Server installed here."
+  ; FileClose $0
 
   ; Save install mode for uninstaller: "AllUsers" or "CurrentUser"
   FileOpen $1 "$INSTDIR\install_mode.txt" w
@@ -147,10 +166,7 @@ Section "Install"
   FileClose $1
 
   ; Shortcuts (MultiUser sets the right context automatically)
-  DetailPrint "SMPROGRAMS = $SMPROGRAMS"
-  CreateDirectory "$SMPROGRAMS\Onyx"
-  CreateShortCut "$SMPROGRAMS\Onyx\User Server.lnk" "$INSTDIR\readme.txt"
-  CreateShortCut "$SMPROGRAMS\Onyx\User Server Config.lnk" "$INSTDIR\UserServerConfig"
+  !insertmacro CreateShortcuts
 
   ; Registry: use SHCTX so it goes to HKLM (all-users) or HKCU (just-me)
   WriteRegStr SHCTX "Software\Onyx\User Server" "InstallDir" "$INSTDIR"
@@ -177,17 +193,14 @@ Section "Uninstall"
   DetailPrint "INSTDIR = $INSTDIR"
   
   ; Remove Start Menu shortcuts
-  DetailPrint "Removing shortcuts from: $SMPROGRAMS\Onyx"
-  Delete "$SMPROGRAMS\Onyx\User Server.lnk"
-  Delete "$SMPROGRAMS\Onyx\User Server Config.lnk"
-  RMDir  "$SMPROGRAMS\Onyx"
+  !insertmacro RemoveShortcuts
 
   ; Remove installed files
   DetailPrint "Removing files from: $INSTDIR"
-  Delete "$INSTDIR\readme.txt"
-  Delete "$INSTDIR\install_mode.txt"
-  Delete "$INSTDIR\Uninstall.exe"
-  RMDir  "$INSTDIR"
+  ; Delete "$INSTDIR\readme.txt"
+  ; Delete "$INSTDIR\install_mode.txt"
+  ; Delete "$INSTDIR\Uninstall.exe"
+  RMDir /r "$INSTDIR"
 
   ; Remove registry keys using SHCTX (automatically uses correct hive)
   DetailPrint "Removing registry keys with SHCTX"
