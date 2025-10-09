@@ -166,6 +166,31 @@ Section "Install"
   FileWrite $1 "$MultiUser.InstallMode"
   FileClose $1
 
+  ; Start Configuration Dir
+
+  ; stage defaults: embed at compile-time, extract at install-time
+  SetOutPath "$INSTDIR\__defaults"
+  File /r "..\defaults\*.*"
+
+  ; compute ConfigDir: sibling of $INSTDIR
+  Var ConfigDir
+  StrCpy $ConfigDir "$INSTDIR\.."
+  GetFullPathName $ConfigDir $ConfigDir
+  StrCpy $ConfigDir "$ConfigDir\UserServerConfig"
+  CreateDirectory "$ConfigDir"
+
+  ; first-install marker (optional)
+  ; ${IfNot} ${FileExists} "$ConfigDir\.installed"
+  ;   FileOpen $0 "$ConfigDir\.installed" w
+  ;   FileWrite $0 "installed"
+  ;   FileClose $0
+  ; ${EndIf}
+
+  ; copy only missing files (recursively) from staged defaults → ConfigDir
+  !insertmacro CopyIfMissing "$INSTDIR\__defaults" "$ConfigDir"
+
+  ; End Configuration Dir
+
   ; Shortcuts (MultiUser sets the right context automatically)
   !insertmacro CreateShortcuts
 
