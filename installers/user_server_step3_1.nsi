@@ -6,6 +6,7 @@
 !define MULTIUSER_INSTALLMODE_COMMANDLINE       ; (optional) /AllUsers or /CurrentUser for silent mode
 !define MULTIUSER_USE_PROGRAMFILES64            ; for all-users default to Program Files (64-bit)
 !include "MultiUser.nsh"
+!include "Include\CopyIfMissing.nsh"
 
 Name "Onyx User Server"
 OutFile "UserServer-Setup-step3_1.exe"
