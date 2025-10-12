@@ -173,7 +173,7 @@ Section "Install"
   File /r "..\defaults\*.*"
 
   ; compute ConfigDir: sibling of $INSTDIR
-  Var ConfigDir
+  Var /GLOBAL ConfigDir
   StrCpy $ConfigDir "$INSTDIR\.."
   GetFullPathName $ConfigDir $ConfigDir
   StrCpy $ConfigDir "$ConfigDir\UserServerConfig"
