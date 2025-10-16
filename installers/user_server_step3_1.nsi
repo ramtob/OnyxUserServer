@@ -241,10 +241,10 @@ Section "Uninstall"
   !insertmacro LocateConfigDir
   ; If user checked the corresponding checkbox
   ${If} $UnRemoveCfg == ${BST_CHECKED}
-    DetailPrint "Removing config folder: $ConfigDir"
+    DetailPrint "==Removing config folder: $ConfigDir"
     RMDir /r "$ConfigDir"
   ${Else}
-    DetailPrint "Keeping config folder: $ConfigDir"
+    DetailPrint "==Keeping config folder: $ConfigDir"
   ${EndIf}
 
   ; Remove registry keys using SHCTX (automatically uses correct hive)
