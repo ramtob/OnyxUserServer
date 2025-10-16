@@ -7,6 +7,7 @@
 !define MULTIUSER_USE_PROGRAMFILES64            ; for all-users default to Program Files (64-bit)
 !include "MultiUser.nsh"
 !include "Include\CopyIfMissing.nsh"
+!include "Include\UninstallCustomPage.nsh"
 
 Name "Onyx User Server"
 OutFile "UserServer-Setup-step3_1.exe"
@@ -26,8 +27,11 @@ InstallDir $INSTDIR
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirPage_Leave
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+; Uninstaller pages
 !insertmacro MUI_UNPAGE_CONFIRM
+UninstPage custom un.PageRemoveConfig_Create un.PageRemoveConfig_Leave
 !insertmacro MUI_UNPAGE_INSTFILES
+
 !insertmacro MUI_LANGUAGE "English"
 
 ; --- required init hooks for MultiUser ---
@@ -129,6 +133,16 @@ FunctionEnd
   RMDir  "$SMPROGRAMS\Onyx"
 !macroend
 
+Var ConfigDir
+
+!macro LocateConfigDir
+  ; compute ConfigDir: sibling of $INSTDIR
+  StrCpy $ConfigDir "$INSTDIR\.."
+  GetFullPathName $ConfigDir $ConfigDir
+  StrCpy $ConfigDir "$ConfigDir\UserServerConfig"
+  DetailPrint "Local Config Directory is '$ConfigDir'"
+!macroend
+  
 ; -----------------------------------------
 ; Install Section
 ; -----------------------------------------
@@ -174,19 +188,8 @@ Section "Install"
   SetOutPath "$INSTDIR\__defaults"
   File /r "..\defaults\*.*"
 
-  ; compute ConfigDir: sibling of $INSTDIR
-  Var /GLOBAL ConfigDir
-  StrCpy $ConfigDir "$INSTDIR\.."
-  GetFullPathName $ConfigDir $ConfigDir
-  StrCpy $ConfigDir "$ConfigDir\UserServerConfig"
+  !insertmacro LocateConfigDir
   CreateDirectory "$ConfigDir"
-
-  ; first-install marker (optional)
-  ; ${IfNot} ${FileExists} "$ConfigDir\.installed"
-  ;   FileOpen $0 "$ConfigDir\.installed" w
-  ;   FileWrite $0 "installed"
-  ;   FileClose $0
-  ; ${EndIf}
 
   ; copy only missing files (recursively) from staged defaults → ConfigDir
   DetailPrint "==Copying config files (only files that are missing)"
@@ -230,12 +233,19 @@ Section "Uninstall"
   ; Remove Start Menu shortcuts
   !insertmacro RemoveShortcuts
 
-  ; Remove installed files
+  ; Remove installed code files
   DetailPrint "==Removing files from: $INSTDIR"
-  ; Delete "$INSTDIR\readme.txt"
-  ; Delete "$INSTDIR\install_mode.txt"
-  ; Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"
+
+  ; Optionally remove config files
+  !insertmacro LocateConfigDir
+  ; If user checked the corresponding checkbox
+  ${If} $UnRemoveCfg == ${BST_CHECKED}
+    DetailPrint "Removing config folder: $ConfigDir"
+    RMDir /r "$ConfigDir"
+  ${Else}
+    DetailPrint "Keeping config folder: $ConfigDir"
+  ${EndIf}
 
   ; Remove registry keys using SHCTX (automatically uses correct hive)
   DetailPrint "==Removing registry keys with SHCTX"
