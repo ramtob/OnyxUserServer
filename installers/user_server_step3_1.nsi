@@ -149,13 +149,14 @@ Section "Install"
   SetOutPath "$INSTDIR"
   
   ; Debug output (will show during install files page)
-  DetailPrint "Install section started - INSTDIR = $INSTDIR"
+  DetailPrint "==Install section started - INSTDIR = $INSTDIR"
 
   ; --- 4.1 Copy app payload ---
   SetOverwrite ifnewer                 ; safer for updates
   ; Adjust path if your script isn’t next to project_root.
   ; From your earlier layout, we’re in C:\Projects\OnyxUserServer\installers
   ; so "..\dist\*" reaches the build folder:
+  DetailPrint "==Copying code files"
   File /r "..\dist\*.*"  ; demo payload
   ; FileOpen $0 "$INSTDIR\readme.txt" w
   ; FileWrite $0 "Onyx User Server installed here."
@@ -169,6 +170,7 @@ Section "Install"
   ; Start Configuration Dir
 
   ; stage defaults: embed at compile-time, extract at install-time
+  DetailPrint "==Copying config files to temporary directory '$INSTDIR\__defaults'"
   SetOutPath "$INSTDIR\__defaults"
   File /r "..\defaults\*.*"
 
@@ -187,13 +189,19 @@ Section "Install"
   ; ${EndIf}
 
   ; copy only missing files (recursively) from staged defaults → ConfigDir
+  DetailPrint "==Copying config files (only files that are missing)"
   !insertmacro CopyIfMissing "$INSTDIR\__defaults" "$ConfigDir"
+
+  ; Remove the staged defaults to keep install dir clean
+  DetailPrint "==Removeing the temporary directory '$INSTDIR\__defaults'"
+  RMDir /r "$INSTDIR\__defaults"
 
   ; End Configuration Dir
 
   ; Shortcuts (MultiUser sets the right context automatically)
   !insertmacro CreateShortcuts
 
+  DetailPrint "==Updating Registry"
   ; Registry: use SHCTX so it goes to HKLM (all-users) or HKCU (just-me)
   WriteRegStr SHCTX "Software\Onyx\User Server" "InstallDir" "$INSTDIR"
   ; Save the mode for the uninstaller: "AllUsers" or "CurrentUser"
@@ -207,6 +215,7 @@ Section "Install"
   WriteRegExpandStr  SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
 
   ; Uninstaller
+  DetailPrint "==Creating uninstaller"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 SectionEnd
 
@@ -222,14 +231,14 @@ Section "Uninstall"
   !insertmacro RemoveShortcuts
 
   ; Remove installed files
-  DetailPrint "Removing files from: $INSTDIR"
+  DetailPrint "==Removing files from: $INSTDIR"
   ; Delete "$INSTDIR\readme.txt"
   ; Delete "$INSTDIR\install_mode.txt"
   ; Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"
 
   ; Remove registry keys using SHCTX (automatically uses correct hive)
-  DetailPrint "Removing registry keys with SHCTX"
+  DetailPrint "==Removing registry keys with SHCTX"
   DeleteRegKey SHCTX "Software\Onyx\User Server"
   DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server"
   
