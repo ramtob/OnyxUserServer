@@ -122,8 +122,13 @@ FunctionEnd
 !macro CreateShortcuts
   DetailPrint "Creating shortcuts under $SMPROGRAMS\Onyx"
   CreateDirectory "$SMPROGRAMS\Onyx"
-  CreateShortCut "$SMPROGRAMS\Onyx\User Server.lnk" "$INSTDIR\UserServer.txt"
-  CreateShortCut "$SMPROGRAMS\Onyx\User Server Config.lnk" "$INSTDIR\UserServerConfig.txt"  ; or a config editor EXE if/when you have it
+  CreateShortCut "$SMPROGRAMS\Onyx\User Server.lnk" "$INSTDIR\UserServer.txt" "" "$INSTDIR\onyx_user_server_icon.ico"
+  CreateShortCut "$SMPROGRAMS\Onyx\User Server Config.lnk" "$ConfigDir"  ; or a config editor EXE if/when we have it
+  ; OPTIONAL: Desktop folder with the same links
+  DetailPrint "Creating shortcuts under $DESKTOP\User Server"
+  CreateDirectory "$DESKTOP\User Server"
+  CreateShortCut "$DESKTOP\User Server\User Server.lnk" "$INSTDIR\UserServer.txt"
+  CreateShortCut "$DESKTOP\User Server\User Server Config.lnk" "$ConfigDir"
 !macroend
 
 !macro RemoveShortcuts
@@ -131,6 +136,11 @@ FunctionEnd
   Delete "$SMPROGRAMS\Onyx\User Server.lnk"
   Delete "$SMPROGRAMS\Onyx\User Server Config.lnk"
   RMDir  "$SMPROGRAMS\Onyx"
+  ; OPTIONAL (if we created the desktop folder)
+  DetailPrint "Removing shortcuts under $DESKTOP\User Server"
+  Delete "$DESKTOP\User Server\User Server.lnk"
+  Delete "$DESKTOP\User Server\User Server Config.lnk"
+  RMDir  "$DESKTOP\User Server"
 !macroend
 
 Var ConfigDir
@@ -172,9 +182,7 @@ Section "Install"
   ; so "..\dist\*" reaches the build folder:
   DetailPrint "==Copying code files"
   File /r "..\dist\*.*"  ; demo payload
-  ; FileOpen $0 "$INSTDIR\readme.txt" w
-  ; FileWrite $0 "Onyx User Server installed here."
-  ; FileClose $0
+  File "..\installers\assets\onyx_user_server_icon.ico" ; app icon
 
   ; Save install mode for uninstaller: "AllUsers" or "CurrentUser"
   FileOpen $1 "$INSTDIR\install_mode.txt" w
@@ -220,6 +228,9 @@ Section "Install"
   ; Uninstaller
   DetailPrint "==Creating uninstaller"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+  MessageBox MB_YESNO "Open the configuration folder now?" IDNO +2
+    ExecShell "open" "$ConfigDir"
 SectionEnd
 
 ; -----------------------------------------
