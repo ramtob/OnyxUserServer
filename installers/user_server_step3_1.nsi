@@ -223,6 +223,7 @@ Section "Install"
   WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "Publisher"        "Onyx"
   WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "DisplayVersion"   "0.0.1"
   WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "InstallLocation"  "$INSTDIR"
+  WriteRegExpandStr  SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "DisplayIcon" "$INSTDIR\onyx_user_server_icon.ico"
   WriteRegExpandStr  SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
 
   ; Uninstaller
