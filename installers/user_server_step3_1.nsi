@@ -1,4 +1,4 @@
-; --- icons for the wizard windows (these lines have to be before include MUI ) ---
+; --- icons for the wizard windows (MUI-aware) (this is the way to set the icons when we use MUI ) ---
 !define MUI_ICON       "..\installers\assets\onyx_user_server_icon.ico"
 !define MUI_UNICON     "..\installers\assets\onyx_user_server_icon.ico"
 
