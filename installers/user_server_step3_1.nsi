@@ -1,3 +1,7 @@
+; --- icons for the wizard windows (these lines have to be before include MUI ) ---
+!define MUI_ICON       "..\installers\assets\onyx_user_server_icon.ico"
+!define MUI_UNICON     "..\installers\assets\onyx_user_server_icon.ico"
+
 !include "MUI2.nsh"
 
 ; --- MultiUser: minimal setup ---
@@ -127,7 +131,7 @@ FunctionEnd
   ; OPTIONAL: Desktop folder with the same links
   DetailPrint "Creating shortcuts under $DESKTOP\User Server"
   CreateDirectory "$DESKTOP\User Server"
-  CreateShortCut "$DESKTOP\User Server\User Server.lnk" "$INSTDIR\UserServer.txt"
+  CreateShortCut "$DESKTOP\User Server\User Server.lnk" "$INSTDIR\UserServer.txt" "" "$INSTDIR\onyx_user_server_icon.ico"
   CreateShortCut "$DESKTOP\User Server\User Server Config.lnk" "$ConfigDir"
 !macroend
 
