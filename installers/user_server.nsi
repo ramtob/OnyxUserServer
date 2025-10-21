@@ -240,12 +240,12 @@ Section "Install"
   WriteRegStr SHCTX "$INST_KEY_PATH" "InstallMode" "$MultiUser.InstallMode"
 
 
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayName"      "$PRODUCT_NAME"
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "Publisher"        "$COMPANY_NAME"
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayVersion"   "$APP_VERSION"
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "InstallLocation"  "$INSTDIR"
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayIcon"      "$APP_ICON_TARGET_PATH"
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
+  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "DisplayName"      "$PRODUCT_NAME"
+  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "Publisher"        "$COMPANY_NAME"
+  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "DisplayVersion"   "$APP_VERSION"
+  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "InstallLocation"  "$INSTDIR"
+  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "DisplayIcon"      "$APP_ICON_TARGET_PATH"
+  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
 
   ; Uninstaller
   DetailPrint "==Creating uninstaller"
@@ -283,7 +283,7 @@ Section "Uninstall"
   ; Remove registry keys using SHCTX (automatically uses correct hive)
   DetailPrint "==Removing registry keys"
   DeleteRegKey SHCTX "$INST_KEY_PATH"
-  DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server"
+  DeleteRegKey SHCTX "$UNINST_KEY_PATH"
   
   DetailPrint "=== Uninstall Section Completed ==="
 SectionEnd
