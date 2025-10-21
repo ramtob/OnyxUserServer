@@ -1,6 +1,9 @@
 ; --- icons for the wizard windows (MUI-aware) (this is the way to set the icons when we use MUI ) ---
-!define MUI_ICON       "..\installers\assets\onyx_user_server_icon.ico"
-!define MUI_UNICON     "..\installers\assets\onyx_user_server_icon.ico"
+!define APP_ICON_FILE_NAME    "onyx_user_server_icon.ico"
+!define APP_ICON_SOURCE_PATH  "..\installers\assets\${APP_ICON_FILE_NAME}"
+!define APP_ICON_TARGET_PATH  "${INSTDIR}\${APP_ICON_FILE_NAME}"
+!define MUI_ICON       "${APP_ICON_SOURCE_PATH}"
+!define MUI_UNICON     "${APP_ICON_SOURCE_PATH}"
 
 !include "MUI2.nsh"
 
@@ -13,8 +16,22 @@
 !include "Include\CopyIfMissing.nsh"
 !include "Include\UninstallCustomPage.nsh"
 
-Name "Onyx User Server"
-OutFile "UserServer-Setup-step3_1.exe"
+; The APP_VERSION number should be passed as a command-line argument for compilation
+; E.g. "makensis /DVERSION=0.9.3 installers\user_server.nsi"
+!ifndef APP_VERSION 
+  !define APP_VERSION "0.0.0"
+!endif
+
+!define COMPANY_NAME    "Onyx"
+!define APP_NAME        "User Server"
+!define PRODUCT_BASE    "${COMPANY_NAME} ${APP_NAME}"
+!define PRODUCT_NAME    "${PRODUCT_BASE} ${APP_VERSION}"      ; shows in UI/Apps list
+!define INST_KEY_PATH   "Software\${PRODUCT_NAME}"
+!define UNINST_KEY_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+
+Name "${PRODUCT_NAME}"
+OutFile "${APP_NAME}-Setup-${APP_VERSION}.exe"
+BrandingText "Installing ${PRODUCT_NAME}"
 
 ; Enable install logging
 !define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Installation Complete"
@@ -101,7 +118,7 @@ Var DirSuffix
 Function DirPage_Pre
   ; Decide mode (MultiUser sets $MultiUser.InstallMode to AllUsers/CurrentUser)
   ; This runs even when the scope page is skipped (non-admin) because MULTIUSER_INIT already ran in .onInit
-  StrCpy $DirSuffix "\Onyx\User Server"
+  StrCpy $DirSuffix "\${APP_NAME}_${APP_VERSION}"
 
   StrCmp $MultiUser.InstallMode "AllUsers" 0 +3
     StrCpy $INSTDIR "$PROGRAMFILES64$DirSuffix"
@@ -124,27 +141,27 @@ Function DirPage_Leave
 FunctionEnd
 
 !macro CreateShortcuts
-  DetailPrint "Creating shortcuts under $SMPROGRAMS\Onyx"
-  CreateDirectory "$SMPROGRAMS\Onyx"
-  CreateShortCut "$SMPROGRAMS\Onyx\User Server.lnk" "$INSTDIR\UserServer.txt" "" "$INSTDIR\onyx_user_server_icon.ico"
-  CreateShortCut "$SMPROGRAMS\Onyx\User Server Config.lnk" "$ConfigDir"  ; or a config editor EXE if/when we have it
+  DetailPrint "Creating shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
+  CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "$APP_ICON_TARGET_PATH"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"  ; or a config editor EXE if/when we have it
   ; OPTIONAL: Desktop folder with the same links
   DetailPrint "Creating shortcuts under $DESKTOP\User Server"
-  CreateDirectory "$DESKTOP\User Server"
-  CreateShortCut "$DESKTOP\User Server\User Server.lnk" "$INSTDIR\UserServer.txt" "" "$INSTDIR\onyx_user_server_icon.ico"
-  CreateShortCut "$DESKTOP\User Server\User Server Config.lnk" "$ConfigDir"
+  CreateDirectory "$DESKTOP\${PRODUCT_NAME}"
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "$APP_ICON_TARGET_PATH"
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"
 !macroend
 
 !macro RemoveShortcuts
-  DetailPrint "Removing shortcuts under $SMPROGRAMS\Onyx"
-  Delete "$SMPROGRAMS\Onyx\User Server.lnk"
-  Delete "$SMPROGRAMS\Onyx\User Server Config.lnk"
-  RMDir  "$SMPROGRAMS\Onyx"
+  DetailPrint "Removing shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
+  Delete "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk"
+  Delete "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk"
+  RMDir  "$SMPROGRAMS\${PRODUCT_NAME}"
   ; OPTIONAL (if we created the desktop folder)
   DetailPrint "Removing shortcuts under $DESKTOP\User Server"
-  Delete "$DESKTOP\User Server\User Server.lnk"
-  Delete "$DESKTOP\User Server\User Server Config.lnk"
-  RMDir  "$DESKTOP\User Server"
+  Delete "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk"
+  Delete "$DESKTOP\${PRODUCT_NAME}\${APP_NAME} Config.lnk"
+  RMDir  "$DESKTOP\${PRODUCT_NAME}"
 !macroend
 
 Var ConfigDir
@@ -153,7 +170,7 @@ Var ConfigDir
   ; compute ConfigDir: sibling of $INSTDIR
   StrCpy $ConfigDir "$INSTDIR\.."
   GetFullPathName $ConfigDir $ConfigDir
-  StrCpy $ConfigDir "$ConfigDir\UserServerConfig"
+  StrCpy $ConfigDir "$ConfigDir\${APP_NAME}Config"
   DetailPrint "Local Config Directory is '$ConfigDir'"
 !macroend
   
@@ -186,7 +203,7 @@ Section "Install"
   ; so "..\dist\*" reaches the build folder:
   DetailPrint "==Copying code files"
   File /r "..\dist\*.*"  ; demo payload
-  File "..\installers\assets\onyx_user_server_icon.ico" ; app icon
+  File "$APP_ICON_SOURCE_PATH" ; app icon
 
   ; Save install mode for uninstaller: "AllUsers" or "CurrentUser"
   FileOpen $1 "$INSTDIR\install_mode.txt" w
@@ -218,17 +235,17 @@ Section "Install"
 
   DetailPrint "==Updating Registry"
   ; Registry: use SHCTX so it goes to HKLM (all-users) or HKCU (just-me)
-  WriteRegStr SHCTX "Software\Onyx\User Server" "InstallDir" "$INSTDIR"
+  WriteRegStr SHCTX "$INST_KEY_PATH" "InstallDir" "$INSTDIR"
   ; Save the mode for the uninstaller: "AllUsers" or "CurrentUser"
-  WriteRegStr SHCTX "Software\Onyx\User Server" "InstallMode" "$MultiUser.InstallMode"
+  WriteRegStr SHCTX "$INST_KEY_PATH" "InstallMode" "$MultiUser.InstallMode"
 
 
-  WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "DisplayName"     "Onyx User Server"
-  WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "Publisher"        "Onyx"
-  WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "DisplayVersion"   "0.0.1"
-  WriteRegStr        SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "InstallLocation"  "$INSTDIR"
-  WriteRegExpandStr  SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "DisplayIcon" "$INSTDIR\onyx_user_server_icon.ico"
-  WriteRegExpandStr  SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayName"      "$PRODUCT_NAME"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "Publisher"        "$COMPANY_NAME"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayVersion"   "$APP_VERSION"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "InstallLocation"  "$INSTDIR"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayIcon"      "$APP_ICON_TARGET_PATH"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
 
   ; Uninstaller
   DetailPrint "==Creating uninstaller"
@@ -264,8 +281,8 @@ Section "Uninstall"
   ${EndIf}
 
   ; Remove registry keys using SHCTX (automatically uses correct hive)
-  DetailPrint "==Removing registry keys with SHCTX"
-  DeleteRegKey SHCTX "Software\Onyx\User Server"
+  DetailPrint "==Removing registry keys"
+  DeleteRegKey SHCTX "$INST_KEY_PATH"
   DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\Onyx User Server"
   
   DetailPrint "=== Uninstall Section Completed ==="
