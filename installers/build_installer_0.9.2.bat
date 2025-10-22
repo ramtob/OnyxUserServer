@@ -1,0 +1,1 @@
+makensis /DAPP_VERSION=0.9.2 .\user_server.nsi
