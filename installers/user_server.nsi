@@ -1,7 +1,7 @@
 ; --- icons for the wizard windows (MUI-aware) (this is the way to set the icons when we use MUI ) ---
 !define APP_ICON_FILE_NAME    "onyx_user_server_icon.ico"
 !define APP_ICON_SOURCE_PATH  "..\installers\assets\${APP_ICON_FILE_NAME}"
-!define APP_ICON_TARGET_PATH  "${INSTDIR}\${APP_ICON_FILE_NAME}"
+!define APP_ICON_TARGET_PATH  "$INSTDIR\${APP_ICON_FILE_NAME}"
 !define MUI_ICON       "${APP_ICON_SOURCE_PATH}"
 !define MUI_UNICON     "${APP_ICON_SOURCE_PATH}"
 
@@ -143,12 +143,12 @@ FunctionEnd
 !macro CreateShortcuts
   DetailPrint "Creating shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "$APP_ICON_TARGET_PATH"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"  ; or a config editor EXE if/when we have it
   ; OPTIONAL: Desktop folder with the same links
   DetailPrint "Creating shortcuts under $DESKTOP\User Server"
   CreateDirectory "$DESKTOP\${PRODUCT_NAME}"
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "$APP_ICON_TARGET_PATH"
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
   CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"
 !macroend
 
@@ -203,7 +203,7 @@ Section "Install"
   ; so "..\dist\*" reaches the build folder:
   DetailPrint "==Copying code files"
   File /r "..\dist\*.*"  ; demo payload
-  File "$APP_ICON_SOURCE_PATH" ; app icon
+  File "${APP_ICON_SOURCE_PATH}" ; app icon
 
   ; Save install mode for uninstaller: "AllUsers" or "CurrentUser"
   FileOpen $1 "$INSTDIR\install_mode.txt" w
@@ -235,17 +235,17 @@ Section "Install"
 
   DetailPrint "==Updating Registry"
   ; Registry: use SHCTX so it goes to HKLM (all-users) or HKCU (just-me)
-  WriteRegStr SHCTX "$INST_KEY_PATH" "InstallDir" "$INSTDIR"
+  WriteRegStr SHCTX "${INST_KEY_PATH}" "InstallDir" "$INSTDIR"
   ; Save the mode for the uninstaller: "AllUsers" or "CurrentUser"
-  WriteRegStr SHCTX "$INST_KEY_PATH" "InstallMode" "$MultiUser.InstallMode"
+  WriteRegStr SHCTX "${INST_KEY_PATH}" "InstallMode" "$MultiUser.InstallMode"
 
 
-  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "DisplayName"      "$PRODUCT_NAME"
-  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "Publisher"        "$COMPANY_NAME"
-  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "DisplayVersion"   "$APP_VERSION"
-  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "InstallLocation"  "$INSTDIR"
-  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "DisplayIcon"      "$APP_ICON_TARGET_PATH"
-  WriteRegStr       SHCTX "$UNINST_KEY_PATH" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayName"      "${PRODUCT_NAME}"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "Publisher"        "${COMPANY_NAME}"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayVersion"   "${APP_VERSION}"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "InstallLocation"  "$INSTDIR"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayIcon"      "${APP_ICON_TARGET_PATH}"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "UninstallString"  "$\"$INSTDIR\Uninstall.exe$\""
 
   ; Uninstaller
   DetailPrint "==Creating uninstaller"
@@ -282,8 +282,8 @@ Section "Uninstall"
 
   ; Remove registry keys using SHCTX (automatically uses correct hive)
   DetailPrint "==Removing registry keys"
-  DeleteRegKey SHCTX "$INST_KEY_PATH"
-  DeleteRegKey SHCTX "$UNINST_KEY_PATH"
+  DeleteRegKey SHCTX "${INST_KEY_PATH}"
+  DeleteRegKey SHCTX "${UNINST_KEY_PATH}"
   
   DetailPrint "=== Uninstall Section Completed ==="
 SectionEnd
