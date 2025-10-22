@@ -21,7 +21,7 @@ Function un.PageRemoveConfig_Create
     "(This resets settings. Leave unchecked to keep your configuration.)"
 
   ${NSD_CreateCheckbox} 0 44u 100% 12u \
-    "Remove 'UserServerConfig' (full reset)"
+    "DELETE ${APP_NAME} CONFIGURATION"
   Pop $UN_H_CHK
   ${NSD_Uncheck} $UN_H_CHK    ; default = unchecked
 
