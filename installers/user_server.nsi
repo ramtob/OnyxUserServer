@@ -152,9 +152,6 @@ FunctionEnd
   CreateDirectory "$DESKTOP\${PRODUCT_NAME}"
   CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
   CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"
-  ; force Windows to reindex Start menu (workaround for caching bug)
-  DetailPrint "==Calling the shell to prevent Start Menu problem"
-  System::Call 'shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
 !macroend
 
 !macro RemoveShortcuts
