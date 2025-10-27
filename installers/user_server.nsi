@@ -152,12 +152,13 @@ FunctionEnd
   DetailPrint "==Creating shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
 
+  ; replace target with app exe under INSTDIR
   !insertmacro CreateShortcutWithAppID \
     "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" \
     "$INSTDIR\UserServer.txt" \
     "${APP_ICON_TARGET_PATH}" \
     "" \
-    "${APP_AUMID}" \
+    "${APP_AUMID_BASE}.${APP_VERSION}" \
     "${PRODUCT_NAME}"
 
   !insertmacro CreateShortcutWithAppID \
@@ -165,7 +166,7 @@ FunctionEnd
     "$ConfigDir" \
     "${APP_ICON_TARGET_PATH}" \
     "" \
-    "${APP_AUMID}" \
+    "${APP_AUMID_BASE}.Config.${APP_VERSION}" \
     "${PRODUCT_NAME} Config"
 
   ; OPTIONAL: Desktop folder with the same links
