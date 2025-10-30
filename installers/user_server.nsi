@@ -22,6 +22,10 @@
   !define APP_VERSION "0.0.0"
 !endif
 
+!ifndef APP_DIST_DIR
+  !define APP_DIST_DIR "..\dist"
+!endif
+
 !define COMPANY_NAME        "Onyx"
 !define APP_NAME            "User Server"
 !define APP_NAME_NO_SPACES  "UserServer"
@@ -211,11 +215,8 @@ Section "Install"
 
   ; --- 4.1 Copy app payload ---
   SetOverwrite ifnewer                 ; safer for updates
-  ; Adjust path if your script isn’t next to project_root.
-  ; From your earlier layout, we’re in C:\Projects\OnyxUserServer\installers
-  ; so "..\dist\*" reaches the build folder:
-  DetailPrint "==Copying code files"
-  File /r "..\dist\*.*"  ; demo payload
+  DetailPrint "==Copying code files from ${APP_DIST_DIR}"
+  File /r "${APP_DIST_DIR}\*.*"  ; demo payload
   File "${APP_ICON_SOURCE_PATH}" ; app icon
 
   ; Save install mode for uninstaller: "AllUsers" or "CurrentUser"
