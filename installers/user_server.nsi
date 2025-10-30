@@ -160,10 +160,9 @@ FunctionEnd
   ; Desktop Shortcuts
   DetailPrint "==Creating shortcuts under $DESKTOP\${PARENT_FOLDER_NAME}"
   CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}" ; Base directory - will not be rmeoved by uninstaller
-  CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}"
-  CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}"
-  CreateShortCut  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
-  CreateShortCut  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk" "$ConfigDir"
+  CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}"
+  CreateShortCut  "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
+  CreateShortCut  "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk" "$ConfigDir"
 !macroend
 
 !macro RemoveShortcuts
@@ -173,10 +172,9 @@ FunctionEnd
   RMDir  "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}"
   ; OPTIONAL (if we created the desktop folder)
   DetailPrint "Removing shortcuts under $DESKTOP\${PARENT_FOLDER_NAME}"
-  Delete "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk"
-  Delete "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk"
-  RMDir  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}"
-  RMDir  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}"
+  Delete "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk"
+  Delete "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk"
+  RMDir  "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}"
 !macroend
 
 Var ConfigDir
