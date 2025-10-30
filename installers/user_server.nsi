@@ -14,7 +14,7 @@
 !define MULTIUSER_USE_PROGRAMFILES64            ; for all-users default to Program Files (64-bit)
 !include "MultiUser.nsh"
 !include "Include\CopyIfMissing.nsh"
-!include "Include\ShortcutHelper.nsh"
+; !include "Include\ShortcutHelper.nsh"
 
 ; The APP_VERSION number should be passed as a command-line argument for compilation
 ; E.g. "makensis /DVERSION=0.9.3 installers\user_server.nsi"
@@ -38,8 +38,8 @@ BrandingText "Installing ${PRODUCT_NAME}"
 !include "Include\UninstallCustomPage.nsh"
 
 ; Constants for setting unique AppUserModelID for shortcuts of each app version
-!define APP_AUMID_BASE "${COMPANY_NAME}.${APP_NAME_NO_SPACES}"
-!define APP_AUMID "${APP_AUMID_BASE}.${APP_VERSION}"
+; !define APP_AUMID_BASE "${COMPANY_NAME}.${APP_NAME_NO_SPACES}"
+; !define APP_AUMID "${APP_AUMID_BASE}.${APP_VERSION}"
 
 ; Enable install logging
 !define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Installation Complete"
@@ -151,23 +151,25 @@ FunctionEnd
 !macro CreateShortcuts
   DetailPrint "==Creating shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"
 
   ; replace target with app exe under INSTDIR
-  !insertmacro CreateShortcutWithAppID \
-    "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" \
-    "$INSTDIR\UserServer.txt" \
-    "${APP_ICON_TARGET_PATH}" \
-    "" \
-    "${APP_AUMID_BASE}.${APP_VERSION}" \
-    "${PRODUCT_NAME}"
+  ; !insertmacro CreateShortcutWithAppID \
+  ;   "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" \
+  ;   "$INSTDIR\UserServer.txt" \
+  ;   "${APP_ICON_TARGET_PATH}" \
+  ;   "" \
+  ;   "${APP_AUMID_BASE}.${APP_VERSION}" \
+  ;   "${PRODUCT_NAME}"
 
-  !insertmacro CreateShortcutWithAppID \
-    "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" \
-    "$ConfigDir" \
-    "${APP_ICON_TARGET_PATH}" \
-    "" \
-    "${APP_AUMID_BASE}.Config.${APP_VERSION}" \
-    "${PRODUCT_NAME} Config"
+  ; !insertmacro CreateShortcutWithAppID \
+  ;   "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" \
+  ;   "$ConfigDir" \
+  ;   "${APP_ICON_TARGET_PATH}" \
+  ;   "" \
+  ;   "${APP_AUMID_BASE}.Config.${APP_VERSION}" \
+  ;   "${PRODUCT_NAME} Config"
 
   ; OPTIONAL: Desktop folder with the same links
   DetailPrint "==Creating shortcuts under $DESKTOP\User Server"
