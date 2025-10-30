@@ -16,6 +16,8 @@
 !include "Include\CopyIfMissing.nsh"
 ; !include "Include\ShortcutHelper.nsh"
 
+; === COMMAND LINE PARAMETERS ===
+
 ; The APP_VERSION number should be passed as a command-line argument for compilation
 ; E.g. "makensis /DVERSION=0.9.3 installers\user_server.nsi"
 !ifndef APP_VERSION 
@@ -25,6 +27,12 @@
 !ifndef APP_DIST_DIR
   !define APP_DIST_DIR "..\dist"
 !endif
+
+!ifndef CONFIG_DEFAULTS_DIR
+  !define CONFIG_DEFAULTS_DIR '..\defaults'
+!endif
+
+; === CONSTANTS ===
 
 !define COMPANY_NAME        "Onyx"
 !define APP_NAME            "User Server"
@@ -229,7 +237,7 @@ Section "Install"
   ; stage defaults: embed at compile-time, extract at install-time
   DetailPrint "==Copying config files to temporary directory '$INSTDIR\__defaults'"
   SetOutPath "$INSTDIR\__defaults"
-  File /r "..\defaults\*.*"
+  File /r "${CONFIG_DEFAULTS_DIR}\*.*"
 
   !insertmacro LocateConfigDir
   CreateDirectory "$ConfigDir"
