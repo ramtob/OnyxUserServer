@@ -25,16 +25,16 @@
 !define COMPANY_NAME        "Onyx"
 !define APP_NAME            "User Server"
 !define APP_NAME_NO_SPACES  "UserServer"
-!define PARENT_FOLDER_NAME  "Onyx"
+!define PARENT_FOLDER_NAME  "User Server"
 !define CONFIG_FOLDER_NAME  "UserServerConfig"
-!define PRODUCT_BASE        "${COMPANY_NAME} ${APP_NAME}"
-!define PRODUCT_NAME        "${PRODUCT_BASE} ${APP_VERSION}"      ; shows in UI/Apps list
-!define INST_KEY_PATH       "Software\${PRODUCT_NAME}"
-!define UNINST_KEY_PATH     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+!define PRODUCT_NAME        "${COMPANY_NAME} ${APP_NAME}"
+!define PRODUCT_NAME_WITH_VERSION        "${PRODUCT_NAME} ${APP_VERSION}"      ; shows in UI/Apps list
+!define INST_KEY_PATH       "Software\${PRODUCT_NAME_WITH_VERSION}"
+!define UNINST_KEY_PATH     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME_WITH_VERSION}"
 
-Name "${PRODUCT_NAME}"
+Name "${PRODUCT_NAME_WITH_VERSION}"
 OutFile "${APP_NAME}-Setup-${APP_VERSION}.exe"
-BrandingText "Installing ${PRODUCT_NAME}"
+BrandingText "Installing ${PRODUCT_NAME_WITH_VERSION}"
 !include "Include\UninstallCustomPage.nsh"
 
 ; Constants for setting unique AppUserModelID for shortcuts of each app version
@@ -149,45 +149,34 @@ Function DirPage_Leave
 FunctionEnd
 
 !macro CreateShortcuts
-  DetailPrint "==Creating shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
-  CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"
+  ; Start Menu Shortcuts
+  DetailPrint "==Creating shortcut $SMPROGRAMS\${PRODUCT_NAME}"
+  ; A shortcut to the desktop parent shortcuts directory. Will not be removed by the uninstaller.
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$DESKTOP\${PARENT_FOLDER_NAME}" "" "${APP_ICON_TARGET_PATH}"
+  ; CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}"
+  ; CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
+  ; CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk" "$ConfigDir"
 
-  ; replace target with app exe under INSTDIR
-  ; !insertmacro CreateShortcutWithAppID \
-  ;   "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk" \
-  ;   "$INSTDIR\UserServer.txt" \
-  ;   "${APP_ICON_TARGET_PATH}" \
-  ;   "" \
-  ;   "${APP_AUMID_BASE}.${APP_VERSION}" \
-  ;   "${PRODUCT_NAME}"
-
-  ; !insertmacro CreateShortcutWithAppID \
-  ;   "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk" \
-  ;   "$ConfigDir" \
-  ;   "${APP_ICON_TARGET_PATH}" \
-  ;   "" \
-  ;   "${APP_AUMID_BASE}.Config.${APP_VERSION}" \
-  ;   "${PRODUCT_NAME} Config"
-
-  ; OPTIONAL: Desktop folder with the same links
-  DetailPrint "==Creating shortcuts under $DESKTOP\User Server"
-  CreateDirectory "$DESKTOP\${PRODUCT_NAME}"
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}\${APP_NAME} Config.lnk" "$ConfigDir"
+  ; Desktop Shortcuts
+  DetailPrint "==Creating shortcuts under $DESKTOP\${PARENT_FOLDER_NAME}"
+  CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}" ; Base directory - will not be rmeoved by uninstaller
+  CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}"
+  CreateDirectory "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}"
+  CreateShortCut  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk" "$INSTDIR\UserServer.txt" "" "${APP_ICON_TARGET_PATH}"
+  CreateShortCut  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk" "$ConfigDir"
 !macroend
 
 !macro RemoveShortcuts
-  DetailPrint "Removing shortcuts under $SMPROGRAMS\${PRODUCT_NAME}"
-  Delete "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME}.lnk"
-  Delete "$SMPROGRAMS\${PRODUCT_NAME}\${APP_NAME} Config.lnk"
-  RMDir  "$SMPROGRAMS\${PRODUCT_NAME}"
+  DetailPrint "Removing shortcuts under $SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}"
+  Delete "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk"
+  Delete "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk"
+  RMDir  "$SMPROGRAMS\${PRODUCT_NAME_WITH_VERSION}"
   ; OPTIONAL (if we created the desktop folder)
-  DetailPrint "Removing shortcuts under $DESKTOP\User Server"
-  Delete "$DESKTOP\${PRODUCT_NAME}\${APP_NAME}.lnk"
-  Delete "$DESKTOP\${PRODUCT_NAME}\${APP_NAME} Config.lnk"
-  RMDir  "$DESKTOP\${PRODUCT_NAME}"
+  DetailPrint "Removing shortcuts under $DESKTOP\${PARENT_FOLDER_NAME}"
+  Delete "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME}.lnk"
+  Delete "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}\${APP_NAME} Config.lnk"
+  RMDir  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}\${PRODUCT_NAME_WITH_VERSION}"
+  RMDir  "$DESKTOP\${PARENT_FOLDER_NAME}\${APP_VERSION}"
 !macroend
 
 Var ConfigDir
@@ -266,7 +255,7 @@ Section "Install"
   WriteRegStr SHCTX "${INST_KEY_PATH}" "InstallMode" "$MultiUser.InstallMode"
 
 
-  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayName"      "${PRODUCT_NAME}"
+  WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayName"      "${PRODUCT_NAME_WITH_VERSION}"
   WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "Publisher"        "${COMPANY_NAME}"
   WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "DisplayVersion"   "${APP_VERSION}"
   WriteRegStr       SHCTX "${UNINST_KEY_PATH}" "InstallLocation"  "$INSTDIR"
