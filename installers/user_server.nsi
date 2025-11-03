@@ -57,29 +57,40 @@ BrandingText "Installing ${PRODUCT_NAME_WITH_VERSION}"
 !define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Installation Complete"
 !define MUI_INSTFILESPAGE_ABORTHEADER_TEXT "Installation Aborted"
 InstallDir $INSTDIR
-
-; We'll let the user pick the folder on the Directory page as usual.
-; (Tip: when choosing "All users", pick Program Files; when "Just me", pick a user-writable folder.)
+Var ConfigDir ; The target user-configuration folder path
 
 ; --- PAGES ---
+
+; === Installer pages
 !insertmacro MULTIUSER_PAGE_INSTALLMODE         ; << adds "All users / Just me" page
 ; ---- Directory page hooks ----
+; We'll let the user pick the folder on the Directory page as usual.
+; (Tip: when choosing "All users", pick Program Files; when "Just me", pick a user-writable folder.)
 !define MUI_PAGE_CUSTOMFUNCTION_PRE  DirPage_Pre
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirPage_Leave
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
-; Uninstaller pages
+; Prevent automatic advance to the Finish page - Give the user an opportunity to view the logs
+!define MUI_FINISHPAGE_NOAUTOCLOSE 
+; --- Finish page checkbox: "Open the configuration folder" ---
+!define MUI_FINISHPAGE_RUN_TEXT "Open the configuration folder now"
+!define MUI_FINISHPAGE_RUN "$WINDIR\explorer.exe"
+!define MUI_FINISHPAGE_RUN_PARAMETERS "$ConfigDir"
+!define MUI_FINISHPAGE_RUN_NOTCHECKED
+!insertmacro MUI_PAGE_FINISH
+; === Uninstaller pages
 !insertmacro MUI_UNPAGE_CONFIRM
 UninstPage custom un.PageRemoveConfig_Create un.PageRemoveConfig_Leave
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "English"
 
+; === FUNCTIONS ===
+
 ; --- required init hooks for MultiUser ---
 Function .onInit
   !insertmacro MULTIUSER_INIT
   SetRegView 64
-  ; MessageBox MB_OK "EXEDIR = $EXEDIR"
 FunctionEnd
 
 Function un.onInit
@@ -189,8 +200,6 @@ FunctionEnd
   RMDir  "$DESKTOP\${PARENT_FOLDER_NAME}\${PRODUCT_NAME_WITH_VERSION}"
 !macroend
 
-Var ConfigDir
-
 !macro LocateConfigDir
   ; compute ConfigDir: sibling of $INSTDIR
   StrCpy $ConfigDir "$INSTDIR\.."
@@ -273,8 +282,8 @@ Section "Install"
   DetailPrint "==Creating uninstaller"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  MessageBox MB_YESNO "Open the configuration folder now?" IDNO +2
-    ExecShell "open" "$ConfigDir"
+  ; MessageBox MB_YESNO "Open the configuration folder now?" IDNO +2
+  ;   ExecShell "open" "$ConfigDir"
 SectionEnd
 
 ; -----------------------------------------
