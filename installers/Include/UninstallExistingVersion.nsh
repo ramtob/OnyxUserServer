@@ -15,6 +15,9 @@ Function FindExistingInstall
   StrCpy $PrevDir ""
   StrCpy $PrevVer ""
 
+  ; Search for existing install in registry, in both HKLM and HKCU.
+  ; Because per-user installs write to HKCU, and per-machine installs write to HKLM,
+  ; we have to check both locations.
   ; Try HKLM first
   ClearErrors
   ReadRegStr $PrevDir HKLM "${UNINST_KEY_PATH}" "InstallLocation"
