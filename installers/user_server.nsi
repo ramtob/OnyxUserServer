@@ -41,8 +41,8 @@
 !define CONFIG_FOLDER_NAME  "UserServerConfig"
 !define PRODUCT_NAME        "${COMPANY_NAME} ${APP_NAME}"
 !define PRODUCT_NAME_WITH_VERSION        "${PRODUCT_NAME} ${APP_VERSION}"      ; shows in UI/Apps list
-!define INST_KEY_PATH       "Software\${PRODUCT_NAME_WITH_VERSION}"
-!define UNINST_KEY_PATH     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME_WITH_VERSION}"
+!define INST_KEY_PATH       "Software\${PRODUCT_NAME}"
+!define UNINST_KEY_PATH     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
 Name "${PRODUCT_NAME_WITH_VERSION}"
 OutFile "${APP_NAME}-Setup-${APP_VERSION}.exe"
