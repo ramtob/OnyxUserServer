@@ -14,6 +14,7 @@
 !define MULTIUSER_USE_PROGRAMFILES64            ; for all-users default to Program Files (64-bit)
 !include "MultiUser.nsh"
 !include "Include\CopyIfMissing.nsh"
+!include "Include\UninstallExistingVersion.nsh"
 ; !include "Include\ShortcutHelper.nsh"
 
 ; === COMMAND LINE PARAMETERS ===
@@ -91,6 +92,9 @@ UninstPage custom un.PageRemoveConfig_Create un.PageRemoveConfig_Leave
 Function .onInit
   !insertmacro MULTIUSER_INIT
   SetRegView 64
+
+  ; Check for existing installation
+  !insertmacro FIND_EXISTING_INSTALL
 FunctionEnd
 
 Function un.onInit

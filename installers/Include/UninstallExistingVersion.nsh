@@ -59,4 +59,26 @@ FunctionEnd
 
 ;==============================================================
 
+; Add this macro to .onInit to find and uninstall existing version
+
+!macro FIND_EXISTING_INSTALL
+  Call FindExistingInstall
+  ${If} $PrevRoot != ""
+    StrCpy $0 "${PRODUCT_NAME} is already installed."
+    ${If} $PrevVer != ""
+      StrCpy $0 "$0$\r$\nInstalled version: $PrevVer"
+    ${EndIf}
+    StrCpy $0 "$0$\r$\nInstall location: $PrevDir"
+    StrCpy $0 "$0$\r$\n$\r$\nDo you want to uninstall it and install version ${APP_VERSION}?"
+
+    MessageBox MB_ICONQUESTION|MB_YESNO "$0" IDYES do_uninstall
+      Abort
+
+    do_uninstall:
+    Call UninstallPreviousInstall
+  ${EndIf}
+!macroend
+
+;=============================================================
+
 !endif
