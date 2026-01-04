@@ -44,7 +44,7 @@ Function UninstallPreviousInstall
   StrCpy $0 "$PrevDir\${UNINST_EXE_NAME}"
 
   ${IfNot} ${FileExists} "$0"
-    MessageBox MB_ICONSTOP "Existing ${PRODUCT_BASE} found at:$\r$\n$PrevDir$\r$\nBut $0 was not found. Cannot auto-uninstall."
+    MessageBox MB_ICONSTOP "Existing ${PRODUCT_NAME} found at:$\r$\n$PrevDir$\r$\nBut $0 was not found. Cannot auto-uninstall."
     Abort
   ${EndIf}
 
