@@ -48,8 +48,8 @@ Function UninstallPreviousInstall
     Abort
   ${EndIf}
 
-  ; Silent uninstall. _?= keeps the uninstaller anchored so it can delete itself.
-  ExecWait '"$0" /S _?=$PrevDir' $1
+  ; Uninstall. _?= keeps the uninstaller anchored so it can delete itself.
+  ExecWait '"$0" _?=$PrevDir' $1
 
   ${If} $1 != 0
     MessageBox MB_ICONSTOP "Uninstall failed (exit code $1). Setup will abort."
