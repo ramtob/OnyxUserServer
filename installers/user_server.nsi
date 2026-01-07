@@ -42,6 +42,7 @@
 !define CONFIG_FOLDER_NAME  "UserServerConfig"
 !define PRODUCT_NAME        "${COMPANY_NAME} ${APP_NAME}"
 !define PRODUCT_NAME_WITH_VERSION        "${PRODUCT_NAME} ${APP_VERSION}"      ; shows in UI/Apps list
+; For the registry keys we use PRODUCT_NAME without version, because we do not allow multiple versions to coexist.
 !define INST_KEY_PATH       "Software\${PRODUCT_NAME}"
 !define UNINST_KEY_PATH     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define UNINST_EXE_NAME   "Uninstall.exe"
